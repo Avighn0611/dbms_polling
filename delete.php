@@ -1,4 +1,9 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+?>
+<?php
 include 'functions.php';
 // Connect to MySQL
 $pdo = pdo_connect_mysql();
@@ -7,7 +12,7 @@ $msg = '';
 // Check that the poll ID exists
 if (isset($_GET['id'])) {
     // Select the record that is going to be deleted
-    $stmt = $pdo->prepare('SELECT * FROM polls WHERE id = ?');
+    $stmt = $pdo->prepare('SELECT * FROM Questions WHERE id = ?');
     $stmt->execute([ $_GET['id'] ]);
     $poll = $stmt->fetch(PDO::FETCH_ASSOC);
     // Check if the poll record exists with the id specified
