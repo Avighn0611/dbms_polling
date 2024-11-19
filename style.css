@@ -86,7 +86,7 @@ body {
 }
 .home table thead td {
     padding: 15px;
-    font-weight: 500;
+    font-weight: 200;
     color: #787a7c;
     font-size: 14px;
 }
@@ -97,7 +97,7 @@ body {
     background-color: #fafafc;
 }
 .home table tbody tr td {
-    padding: 15px;
+    padding: 5px;
 }
 .home table tbody tr td:nth-child(1) {
     color: #a8aaad;
@@ -265,7 +265,7 @@ body {
     flex-flow: column;
 }
 .poll-result .wrapper .poll-question {
-    width: 50%;
+    width: 100%;
     padding-bottom: 7px;
 }
 .poll-result .wrapper .poll-question p {
@@ -280,16 +280,46 @@ body {
     background-color: #f0f3f1;
     border-radius: 15px;
     overflow: hidden;
-    max-width: 340px;
+    max-width: 600px;
 }
 .poll-result .wrapper .poll-question .result-bar-wrapper .result-bar {
     display: flex;
-    height: 25px;
-    min-width: 30px;
+    height: 15px;
+    min-width: 10px;
     background-color: #2bb86c;
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 200;
     color: #FFFFFF;
     justify-content: center;
     align-items: center;
 }
+.auth-buttons {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+    justify-content: center;
+}
+
+.btn-auth {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    appearance: none;
+    cursor: pointer;
+    border: 0;
+    background: #2873cf;
+    color: #FFFFFF;
+    padding: 0 14px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 4px;
+    height: 35px;
+    width: 120px;
+    margin-top: 10px;
+    box-shadow: 0px 0px 6px 1px rgba(45, 54, 68, 0.1);
+}
+.btn-auth:hover {
+    background: #266cc2;
+}
+

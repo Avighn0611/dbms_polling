@@ -1,26 +1,50 @@
 <?php
 include 'functions.php';
+
 // Connect to MySQL
 $pdo = pdo_connect_mysql();
-// If the GET request "id" exists (poll id)...
+
+// Check if poll ID is provided
 if (isset($_GET['id'])) {
-    // MySQL query that selects the poll records by the GET request "id"
-    $stmt = $pdo->prepare('SELECT * FROM Questions WHERE id = ?');
-    $stmt->execute([ $_GET['id'] ]);
-    // Fetch the record
+    // Fetch the poll details
+    $stmt = $pdo->prepare('SELECT * FROM polls WHERE pollID = ?');
+    $stmt->execute([$_GET['id']]);
     $poll = $stmt->fetch(PDO::FETCH_ASSOC);
-    // Check if the poll record exists with the id specified
+
+    // Check if the poll exists
     if ($poll) {
-        // MySQL Query that will get all the answers from the "poll_answers" table
-        $stmt = $pdo->prepare('SELECT * FROM Answers WHERE poll_id = ? ORDER BY votes DESC');
-        $stmt->execute([ $_GET['id'] ]);
-        // Fetch all poll answers
-        $poll_answers = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        // Total number of votes, will be used to calculate the percentage
-        $total_votes = 0;
-        foreach ($poll_answers as $poll_answer) {
-            // Every poll answers votes will be added to total votes
-            $total_votes += $poll_answer['votes'];
+        // Fetch all questions related to the poll
+        $stmt = $pdo->prepare('SELECT * FROM questions WHERE pollID = ?');
+        $stmt->execute([$_GET['id']]);
+        $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $all_results = [];
+        foreach ($questions as $question) {
+            $question_id = $question['questionID'];
+
+            // Fetch options and votes for this question
+            $stmt = $pdo->prepare('
+                SELECT 
+                    o.optionID, 
+                    o.optiontext, 
+                    COUNT(v.voteID) AS votes, 
+                    (COUNT(v.voteID) * 100 / 
+                     (SELECT COUNT(*) FROM votes v2 
+                      JOIN options o2 ON v2.optionID = o2.optionID 
+                      WHERE o2.questionID = ?)
+                    ) AS percentage
+                FROM options o
+                LEFT JOIN votes v ON o.optionID = v.optionID
+                WHERE o.questionID = ?
+                GROUP BY o.optionID
+            ');
+            $stmt->execute([$question_id, $question_id]);
+            $options = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $all_results[] = [
+                'question' => $question,
+                'options' => $options
+            ];
         }
     } else {
         exit('Poll with that ID does not exist.');
@@ -30,27 +54,66 @@ if (isset($_GET['id'])) {
 }
 ?>
 
-<?=template_header('Poll Results')?>
-
+<?=template_header('Poll Results')?> 
 <div class="content poll-result">
-
     <h2><?=htmlspecialchars($poll['title'], ENT_QUOTES)?></h2>
-    
-    <p><?=htmlspecialchars($poll['description'], ENT_QUOTES)?></p>
 
-    <div class="wrapper">
-        <?php foreach ($poll_answers as $poll_answer): ?>
+    <?php foreach ($questions as $index => $question): ?>
         <div class="poll-question">
-            <p><?=htmlspecialchars($poll_answer['title'], ENT_QUOTES)?> <span>(<?=$poll_answer['votes']?> Votes)</span></p>
-            <div class="result-bar-wrapper">
-                <div class="result-bar" style="width:___PHP6___%">
-                    <?=$poll_answer['votes'] ? round(($poll_answer['votes']/$total_votes)*100) : 0?>%
-                </div>
-            </div>
-        </div>
-        <?php endforeach; ?>
-    </div>
+            <h3>Question <?=($index + 1)?>: <?=htmlspecialchars($question['questiontext'], ENT_QUOTES)?></h3>
 
+            <div class="result-bar-wrapper">
+                <?php foreach ($all_results[$index]['options'] as $option):
+                    $percentage = round($option['percentage'], 2) ?? 0;
+                ?>
+                    <div class="poll-option">
+                        <p><?=htmlspecialchars($option['optiontext'], ENT_QUOTES)?> (<?=$option['votes']?> votes)</p>
+                        <div class="result-bar" style="width: <?= $percentage ?>%; background-color: #4CAF50;">
+                            <?= $percentage ?>%
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+
+            <a href="analysis.php?id=<?=htmlspecialchars($question['questionID'], ENT_QUOTES)?>" class="analysis-button">Analysis</a>
+        </div>
+    <?php endforeach; ?>
 </div>
 
-<?=template_footer()?>
+<style>
+.result-bar-wrapper {
+    margin: 10px 0;
+}
+
+.poll-option {
+    margin: 5px 0;
+}
+
+.result-bar {
+    height: 20px;
+    background-color: #4CAF50;
+    text-align: center;
+    color: white;
+    line-height: 20px;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.analysis-button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin-top: 15px;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.analysis-button:hover {
+    background-color: #0056b3;
+}
+</style>

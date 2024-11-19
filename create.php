@@ -1,64 +1,107 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-?>
-<?php
+// Include necessary files (db connection, header, etc.)
 include 'functions.php';
-// Connect to MySQL
-$pdo = pdo_connect_mysql();
-// Output message
+
+session_start();
 $msg = '';
-// Check if POST data is not empty
-if (!empty($_POST)) {
-    // Post data not empty insert a new record
-    // Check if POST variable "title" exists, if not default the value to blank, basically the same for all variables
-    $title = isset($_POST['title']) ? $_POST['title'] : '';
-    $desc = isset($_POST['desc']) ? $_POST['desc'] : '';
-    // Insert new record into the "polls" table
-    $stmt = $pdo->prepare('INSERT INTO Questions (title, description) VALUES (?, ?)');
-    $stmt->execute([ $title, $desc ]);
-    // Below will get the last insert ID, this will be the poll id
-    $poll_id = $pdo->lastInsertId();
-    // Get the answers and convert the multiline string to an array, so we can add each answer to the "poll_answers" table
-    $answers = isset($_POST['answers']) ? explode(PHP_EOL, $_POST['answers']) : '';
-    // Iterate the answers and insert into the "poll_answers" table
-    foreach ($answers as $answer) {
-        // If the answer is empty there is no need to insert
-        if (empty($answer)) continue;
-        // Add answer to the "poll_answers" table
-        $stmt = $pdo->prepare('INSERT INTO Answers (poll_id, title, votes) VALUES (?, ?, 0)');
-        $stmt->execute([ $poll_id, $answer ]);
+
+// Assuming the username is stored in the session when the user logs in
+$createdBy = $_SESSION['username'] ?? 'Anonymous';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $pollTitle = $_POST['pollTitle'] ?? null;
+    $pollType = $_POST['pollType'] ?? null;
+    $questions = $_POST['questions'] ?? [];
+
+    if ($pollTitle && $pollType) {
+        // Insert poll details into the database, including the createdby field
+        $stmt = $pdo->prepare('INSERT INTO polls (title, type, createdby) VALUES (?, ?, ?)');
+        $stmt->execute([$pollTitle, $pollType, $createdBy]);
+        $pollID = $pdo->lastInsertId();
+
+        // Insert each question and its options into the database
+        foreach ($questions as $question) {
+            $questionText = $question['text'] ?? '';
+            $options = explode("\n", $question['options'] ?? '');
+
+            if (!empty($questionText)) {
+                // Insert the question
+                $stmt = $pdo->prepare('INSERT INTO questions (pollID, questiontext) VALUES (?, ?)');
+                $stmt->execute([$pollID, $questionText]);
+                $questionID = $pdo->lastInsertId();
+
+                // Insert each option for the question
+                foreach ($options as $option) {
+                    $option = trim($option); // Remove extra whitespace
+                    if (!empty($option)) {
+                        $stmt = $pdo->prepare('INSERT INTO options (questionID, optiontext) VALUES (?, ?)');
+                        $stmt->execute([$questionID, $option]);
+                    }
+                }
+            }
+        }
+
+        // Redirect to the set_dates.php page with the poll ID
+        header("Location: set_dates.php?poll_id=$pollID");
+        exit;
+    } else {
+        echo "Error: Poll title and type are required.";
     }
-    // Output message
-    $msg = 'Created Successfully!';
 }
 ?>
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Poll</title>
+    <link rel="stylesheet" href="style2.css"> <!-- Update path to your CSS -->
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.php">Home</a>
+        <a href="logout.php">Logout</a>
+        <a href="quiz.php">quiz</a>
+        <a href="test.php">test</a>
+    </nav>
+    <div class="container">
+        <section id="createPoll">
+            <h2>Create a Poll</h2>
+            <form id="pollForm" method="POST">
+                <div class="form-group">
+                    <label for="pollTitle">Poll Title:</label>
+                    <input type="text" id="pollTitle" name="pollTitle" required>
+                </div>
 
-<?=template_header('Create Poll')?>
+                <div class="form-group">
+                    <label for="pollType">Poll Type:</label>
+                    <select id="pollType" name="pollType" required onchange="showQuestionCountInput()">
+                        <option value="">Select</option>
+                        <option value="single">Single Question</option>
+                        <option value="multiple">Multiple Choice (MCQ)</option>
+                        <option value="multiple_select">Multiple Select (MSQ)</option>
+                    </select>
+                </div>
 
-<div class="content update">
+                <div id="questionCountInput" class="form-group" style="display: none;">
+                    <label for="questionCount">Number of Questions:</label>
+                    <input type="number" id="questionCount" name="questionCount" min="1" max="20" onchange="generateQuestionFields()">
+                </div>
 
-    <h2>Create Poll</h2>
+                <div id="questionsSection" style="display: none;">
+                    <h3>Questions</h3>
+                    <div id="questionFields"></div>
 
-    <form action="create.php" method="post">
-
-        <label for="title">Title</label>
-        <input type="text" name="title" id="title" placeholder="Title">
-
-        <label for="desc">Description</label>
-        <input type="text" name="desc" id="desc" placeholder="Description">
-
-        <label for="answers">Answer Options (per line)</label>
-        <textarea name="answers" id="answers" placeholder="Option 1<?=PHP_EOL?>Option 2<?=PHP_EOL?>Option 3"></textarea>
-
-        <button type="submit">Create</button>
-
-    </form>
-    <?php if ($msg): ?>
-    <p><?=$msg?></p>
-    <?php endif; ?>
-</div>
-
-<?=template_footer()?>
+                    <!-- Navigation Buttons -->
+                    <div class="navigation-buttons">
+                        <button type="button" id="prevButton" onclick="prevQuestion()" style="display: none;">Previous</button>
+                        <button type="button" id="nextButton" onclick="nextQuestion()" style="display: none;">Next</button>
+                        <button type="submit" id="submitButton" style="display: none;">Submit Poll</button>
+                    </div>
+                </div>
+            </form>
+        </section>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,298 @@
+/* General Body Styling */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f7f7f7; /* Light grey background */
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+/* Navbar Styling */
+.navbar {
+    background-color: #1abc9c; /* Bright teal */
+    padding: 20px;
+    position: sticky;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for background and shadow */
+}
+
+.navbar h1 {
+    font-size: 28px;
+    color: #fff;
+    margin: 0;
+    font-weight: bold;
+    letter-spacing: 2px;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.navbar h1:hover {
+    color: #34495e; /* Dark grey on hover */
+    transform: scale(1.1); /* Slight zoom on hover */
+}
+
+.navbar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 30px; /* Increased space between links */
+    align-items: center;
+}
+
+.navbar ul li {
+    position: relative;
+}
+
+.navbar ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 10px 15px;
+    position: relative;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.navbar ul li a::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #fff;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.navbar ul li a:hover::before {
+    transform: scaleX(1); /* Underline animation on hover */
+}
+
+.navbar ul li a:hover {
+    color: #2C3E50; /* Dark color on hover */
+    transform: translateY(-4px); /* Slight lift effect */
+}
+
+/* Hover effect for the entire navbar (background change) */
+.navbar:hover {
+    background-color: #16a085; /* Darker teal on navbar hover */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Increase shadow on hover */
+}
+
+/* Main Content Styling */
+.content {
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.content h2 {
+    font-size: 36px;
+    color: #333;
+    margin-bottom: 20px;
+    transition: font-size 0.3s ease;
+}
+
+.content h2:hover {
+    font-size: 38px; /* Slightly larger font size on hover */
+}
+
+.create-poll {
+    display: inline-block;
+    background-color: #1abc9c;
+    color: white;
+    padding: 12px 25px;
+    font-size: 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 20px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.create-poll:hover {
+    background-color: #16a085; /* Darker teal */
+    transform: translateY(-4px); /* Lift effect */
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    transition: transform 0.3s ease; /* Smooth table transformation */
+}
+
+table:hover {
+    transform: scale(1.01); /* Slight zoom effect on table hover */
+}
+
+th, td {
+    padding: 15px;
+    text-align: left;
+    transition: background-color 0.3s ease;
+}
+
+th {
+    background-color: #34495e;
+    color: #fff;
+    text-transform: uppercase;
+}
+
+tr:nth-child(even) {
+    background-color: #ecf0f1;
+}
+
+tr:nth-child(odd) {
+    background-color: #fff;
+}
+
+tr:hover {
+    background-color: #bdc3c7; /* Hover effect on row */
+}
+
+.actions a {
+    color: #1abc9c;
+    text-decoration: none;
+    padding: 5px 10px;
+    margin: 0 5px;
+    border-radius: 3px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.actions a:hover {
+    background-color: #1abc9c;
+    color: #fff;
+}
+
+/* Features Section */
+.features {
+    background-color: #fff;
+    padding: 60px 20px;
+    text-align: center;
+    margin-top: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.features:hover {
+    transform: translateY(-5px); /* Lift effect for features section */
+}
+
+.features h3 {
+    font-size: 28px;
+    color: #333;
+    margin-bottom: 40px;
+}
+
+.features .feature-cards {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 30px;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.features:hover .feature-cards {
+    opacity: 1; /* Fade in the cards on hover */
+}
+
+.features .feature-card {
+    background-color: #ecf0f1;
+    padding: 30px;
+    width: 250px;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.features .feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Footer Styling */
+.footer {
+    background-color: #34495e;
+    color: #fff;
+    padding: 30px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.footer ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+.footer ul li {
+    display: inline;
+}
+
+.footer ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+    transition: color 0.3s ease;
+}
+
+.footer ul li a:hover {
+    color: #1abc9c;
+}
+
+.footer p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.content {
+    width: 900px;
+    margin: 0 auto;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    padding: 20px;
+}
+
+.content::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 2px solid #37b770;
+    border-radius: 8px; /* Match content's rounded corners */
+    box-sizing: border-box;
+    animation: animate-border 2.5s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes animate-border {
+    0% {
+        clip-path: polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%);
+    }
+    25% {
+        clip-path: polygon(0% 0%, 100% 0%, 0% 100%, 0% 100%);
+    }
+    50% {
+        clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+    }
+    75% {
+        clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 100% 100%);
+    }
+    100% {
+        clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 0%);
+    }
+}
